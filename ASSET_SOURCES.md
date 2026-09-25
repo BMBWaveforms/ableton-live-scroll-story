@@ -1,6 +1,6 @@
 # Ableton image sources
 
-The active Push 3 page uses a procedural CSS 3D concept model for the Touch, Express, and Build chapters. It uses `push-performance.webp` for the computer-free scene, and pairs `push-top.webp` with `live-session-view.webp` in the Push and Live chapter. `push-top.webp` also appears in the ending. Earlier Live story assets and `push-live.webp` remain in the repository but are not loaded by the active page.
+The active page uses a procedural CSS 3D concept model for the Touch, Express, and Build chapters. Its Hero rotates through ten official Live 12 device screenshots. Later chapters use official Push photography, the Live Session View screenshot, and the official Push 3 introduction video.
 
 
 All image assets below are genuine product screenshots served from Ableton-owned pages and image infrastructure. They are stored locally as WebP for this classroom project. The two Session View files are different resolution exports of the same official screenshot.
@@ -20,6 +20,34 @@ All image assets below are genuine product screenshots served from Ableton-owned
 | `public/assets/ableton/workspace/live-workspace.webp` | [What is Live?](https://www.ableton.com/en/live/what-is-live/) | [Ableton image, 1800 px WebP](https://beta-ableton.imgix.net/media/jmmb5tmv/what-is-live12.png?fm=webp&w=1800&q=84) | Stable full studio workspace view |
 
 Screenshots remain intact. The website changes their crop, scale, contrast, and overlays only in the browser.
+
+## Live 12 device screenshots
+
+The following files come from the [Ableton Live 12 Audio Effect Reference](https://www.ableton.com/en/manual/live-audio-effect-reference/). They appear in the Hero pointer trail and the ten-device sound index.
+
+| Local file | Official image |
+| --- | --- |
+| `official-effects/roar-live12.png` | [Roar](https://ableton-production.imgix.net/live-manual/12/RoarL12.png) |
+| `official-effects/hybrid-reverb-live12.png` | [Hybrid Reverb](https://ableton-production.imgix.net/live-manual/12/HybridReverbL12.png) |
+| `official-effects/spectral-time-live12.png` | [Spectral Time](https://ableton-production.imgix.net/live-manual/12/SpectralTimeL12.png) |
+| `official-effects/auto-filter-live12.png` | [Auto Filter](https://ableton-production.imgix.net/live-manual/12/AutoFilterL12.png) |
+| `official-effects/echo-live12.png` | [Echo](https://ableton-production.imgix.net/live-manual/12/EchoL12.png) |
+| `official-effects/delay-live12.png` | [Delay](https://ableton-production.imgix.net/live-manual/12/DelayEffectL12.png) |
+| `official-effects/reverb-live12.png` | [Reverb](https://ableton-production.imgix.net/live-manual/12/ReverbL12.png) |
+| `official-effects/spectral-resonator-live12.png` | [Spectral Resonator](https://ableton-production.imgix.net/live-manual/12/SpectralResonatorL12.png) |
+| `official-effects/grain-delay-live12.png` | [Grain Delay](https://ableton-production.imgix.net/live-manual/12/GrainDelayL12.png) |
+| `official-effects/chorus-ensemble-live12.png` | [Chorus-Ensemble](https://ableton-production.imgix.net/live-manual/12/ChorusEnsembleL12.png) |
+
+## New Push and video media
+
+| Local file | Official source | Use |
+| --- | --- | --- |
+| `official-push/p3-expressive.jpg` | [Push product page](https://www.ableton.com/en/push/) | Standalone chapter |
+| `official-push/p3-live-control.jpg` | [Push product page](https://www.ableton.com/en/push/) | Push and Live chapter |
+| `official-push/p3-synthesizer.jpg` | [Push product page](https://www.ableton.com/en/push/) | Retained official scene asset |
+| `video/push3-showreel.jpg` | [Ableton YouTube video](https://www.youtube.com/watch?v=qcGUgp6yo_k) | Local Showreel poster; video loads from YouTube after a click |
+
+The Hero trail contains device screenshots only. Product photography is kept in the narrative chapters where the hardware itself is the subject.
 
 ## Motion references
 
