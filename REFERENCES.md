@@ -15,6 +15,6 @@
 | [Awwwards: LUCA DINI dynamic layout](https://www.awwwards.com/inspiration/dynamic-layout-luca-dini) | 网格和字级主导画面，而非用卡片堆叠内容 | Push 与 Live 章节以大标题和跨栏画面组织信息 |
 | [Awwwards: Jacques Marie Mage product archive view](https://www.awwwards.com/inspiration/product-archive-view) | 干净的产品图与克制的图文关系 | Push 画面直接与 Live 界面并置，不添加仿窗口外框 |
 
-英文显示字体使用开源的 [Archivo](https://github.com/google/fonts/tree/main/ofl/archivo) SemiExpanded 800，中文显示字优先使用系统自带的苹方与冬青黑体，正文沿用 Ableton 官网当前的系统无衬线字体逻辑。Archivo 随项目保存其 OFL 许可证。
+参考站将 Beatrice Display Light 用于超大标题，将 Biotif 用于导航和正文。项目不复制这两款商业字体，而使用开源的 [Raleway](https://github.com/google/fonts/tree/main/ofl/raleway) Light 300 承担英文展示字体的超轻几何角色；中文大字优先使用系统苹方 Light，正文使用中性系统无衬线字体。Raleway 随项目保存 OFL 许可证。
 
 模型为概念视觉表达，不应作为 Push 3 真实工业设计尺寸、材质或细节的准确表示。

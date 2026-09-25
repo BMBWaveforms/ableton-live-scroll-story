@@ -1,6 +1,6 @@
 # Push 3 — 留在音乐里
 
-基于 Push 3 产品主题制作的非官方交互式落地页。英文 Hero 用鼠标轨迹唤出效果器与产品画面，中文内容继续讲述从触碰一颗 Pad、塑造声音，到独立创作和回到 Ableton Live 的完整路径。
+基于 Push 3 产品主题制作的非官方交互式落地页。英文 Hero 用鼠标轨迹唤出十种 Live 效果器界面，中文内容继续讲述从触碰一颗 Pad、塑造声音，到独立创作和回到 Ableton Live 的完整路径。
 
 **在线体验：** [https://bmbwaveforms.github.io/ableton-live-scroll-story/](https://bmbwaveforms.github.io/ableton-live-scroll-story/)
 

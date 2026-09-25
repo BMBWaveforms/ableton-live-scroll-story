@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { gsap } from 'gsap';
 import { assetPath } from './utils/assetPath.js';
 import { GestureSynth } from './audioEngine.js';
 import PushModel from './PushModel.jsx';
@@ -49,45 +50,89 @@ function useScrollProgress() {
 }
 
 function Hero() {
-  const serial = useRef(3);
-  const last = useRef({ x: 0, y: 0 });
-  const [trail, setTrail] = useState([
-    { id: 0, media: trailMedia[1], x: 16, y: 34, rotate: -7 },
-    { id: 1, media: trailMedia[2], x: 76, y: 25, rotate: 4 },
-    { id: 2, media: trailMedia[7], x: 69, y: 73, rotate: -3 },
-  ]);
+  const heroRef = useRef(null);
+  const trailRef = useRef(null);
+  const pointer = useRef({ target: { x: 0, y: 0 }, current: { x: 0, y: 0 }, last: { x: 0, y: 0 }, inside: false });
+  const itemIndex = useRef(0);
+  const zIndex = useRef(1);
 
-  function reveal(event, force = false) {
+  useEffect(() => {
+    const state = pointer.current;
+    const render = () => {
+      state.current.x = mix(state.current.x || state.target.x, state.target.x, .1);
+      state.current.y = mix(state.current.y || state.target.y, state.target.y, .1);
+      if (!state.inside) return;
+      const distance = Math.hypot(state.target.x - state.last.x, state.target.y - state.last.y);
+      if (distance < 65) return;
+      const layer = trailRef.current;
+      if (!layer) return;
+      const media = trailMedia[itemIndex.current % trailMedia.length];
+      itemIndex.current += 1;
+      const item = document.createElement('figure');
+      const mask = document.createElement('span');
+      const imageWrap = document.createElement('span');
+      const image = document.createElement('img');
+      item.className = 'trail-item';
+      mask.className = 'trail-mask';
+      imageWrap.className = 'trail-image';
+      image.src = assetPath(media.src);
+      image.alt = '';
+      image.draggable = false;
+      imageWrap.appendChild(image);
+      mask.appendChild(imageWrap);
+      item.appendChild(mask);
+      layer.appendChild(item);
+      const rotation = clamp((state.target.x - state.last.x) / 9, -8, 8);
+      gsap.set(item, { x: state.current.x, y: state.current.y, xPercent: -50, yPercent: -50, rotation: 0, opacity: 1, scale: 1, zIndex: zIndex.current++ });
+      gsap.timeline({ onComplete: () => item.remove() })
+        .to(item, { x: state.target.x, y: state.target.y, rotation, duration: 1, ease: 'none' }, 0)
+        .to(item, { opacity: 0, scale: .95, duration: .5, ease: 'power1.inOut' }, .5);
+      gsap.timeline()
+        .fromTo(mask, { scale: 0 }, { scale: 1.5, duration: .66, ease: 'cubic-bezier(.22,.14,.36,1)' }, 0)
+        .fromTo(imageWrap, { scale: 1.34 }, { scale: .667, duration: .66, ease: 'cubic-bezier(.22,.14,.36,1)' }, 0);
+      state.last = { ...state.target };
+    };
+    gsap.ticker.add(render);
+    return () => {
+      gsap.ticker.remove(render);
+      gsap.killTweensOf(trailRef.current?.querySelectorAll('.trail-item'));
+    };
+  }, []);
+
+  function updatePointer(event, force = false) {
     if (event.pointerType === 'touch' && !force) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const xPx = event.clientX - rect.left;
-    const yPx = event.clientY - rect.top;
-    if (!force && Math.hypot(xPx - last.current.x, yPx - last.current.y) < 82) return;
-    last.current = { x: xPx, y: yPx };
-    const id = serial.current++;
-    const media = trailMedia[id % trailMedia.length];
-    setTrail((items) => [...items.slice(-7), {
-      id,
-      media,
-      x: clamp((xPx / rect.width) * 100, 8, 92),
-      y: clamp((yPx / rect.height) * 100, 15, 88),
-      rotate: ((id * 7) % 13) - 6,
-    }]);
+    const rect = heroRef.current.getBoundingClientRect();
+    const next = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    const state = pointer.current;
+    state.target = next;
+    if (!state.inside || force) {
+      state.current = { ...next };
+      state.last = force ? { x: next.x - 66, y: next.y } : { ...next };
+    }
+    state.inside = true;
   }
 
-  return <section className="hero" id="top" onPointerMove={reveal} onPointerDown={(event) => reveal(event, true)}>
-    <div className="hero-trail" aria-hidden="true">
-      {trail.map((item) => <figure key={item.id} className="trail-item" style={{ '--trail-x': `${item.x}%`, '--trail-y': `${item.y}%`, '--trail-r': `${item.rotate}deg`, '--trail-z': item.id }}>
-        <img src={assetPath(item.media.src)} alt="" draggable="false" />
-      </figure>)}
+  function leaveHero() {
+    pointer.current.inside = false;
+    gsap.to(trailRef.current, { opacity: 0, duration: .33, overwrite: true });
+  }
+
+  function enterHero(event) {
+    gsap.to(trailRef.current, { opacity: 1, duration: .33, overwrite: true });
+    updatePointer(event);
+  }
+
+  return <section className="hero" id="top" ref={heroRef} onPointerEnter={enterHero} onPointerMove={updatePointer} onPointerLeave={leaveHero} onPointerDown={(event) => updatePointer(event, true)}>
+    <div className="hero-trail" ref={trailRef} aria-hidden="true" />
+    <div className="hero-headline" aria-label="Touch shape sound">
+      <span className="hero-word hero-word--one">touch</span>
+      <span className="hero-caption hero-caption--one">64 expressive pads</span>
+      <span className="hero-word hero-word--two">shape</span>
+      <span className="hero-caption hero-caption--two">pitch, slide and pressure</span>
+      <span className="hero-word hero-word--three">sound<span className="hero-dot">.</span></span>
     </div>
-    <div className="hero-copy">
-      <p className="hero-overline">PUSH 3 / AN INSTRUMENT THAT LISTENS</p>
-      <h1>SOUND,<br />IN YOUR HANDS.</h1>
-      <p className="hero-lede">从一颗 Pad 出发，经过力度、音高与音色，最后长成一首完整的作品。</p>
-    </div>
-    <div className="hero-hint"><span className="hero-hint-dot" />移动鼠标，让声音显形<br /><small>MOVE TO REVEAL / CLICK ON TOUCH</small></div>
-    <a className="hero-scroll" href="#effects" aria-label="向下继续探索">↓</a>
+    <div className="hero-pagination" aria-hidden="true"><i /><i /><i /></div>
+    <div className="hero-hint"><span className="hero-hint-dot" />Move to reveal effects</div>
   </section>;
 }
 
@@ -274,8 +319,20 @@ function Standalone() {
 
 function Live() {
   const [ref, progress] = useScrollProgress();
-  const reveal = smooth(map(progress, 0.08, 0.52));
-  return <section className="live-scene" id="live" ref={ref}><div className="live-sticky"><div className="live-copy"><span className="section-kicker">07 / PUSH × LIVE</span><h2>想法长大，<br /><em>回到 Live 继续。</em></h2><p>在 Push 上捕捉表演，再把同一个 Set 带到 Live 的 Session View 里继续编排、混音与打磨。</p></div><div className="live-workspace" style={{ '--reveal': reveal }}><img src={assetPath('assets/ableton/live-session-view.webp')} alt="Ableton Live Session View 的轨道、片段与音符编辑界面" loading="lazy" /></div><div className="live-push" style={{ '--reveal': reveal }}><img src={assetPath('assets/ableton/official-push/p3-live-control.jpg')} alt="Push 3 控制 Ableton Live" loading="lazy" /></div><div className="live-path"><span>在 Push 捕捉</span><b>→</b><span>在 Live 展开</span></div></div></section>;
+  const reveal = .58 + .42 * smooth(map(progress, 0.04, 0.48));
+  return <section className="live-scene" id="live" ref={ref}><div className="live-sticky" style={{ '--reveal': reveal }}>
+    <span className="live-kicker">07 / PUSH × LIVE</span>
+    <div className="live-headline" aria-label="想法长大，回到 Live 继续。">
+      <span className="live-word live-word--one">想法长大，</span>
+      <span className="live-caption live-caption--one">在 Push 捕捉</span>
+      <span className="live-word live-word--two">回到 Live</span>
+      <span className="live-caption live-caption--two">在 Live 展开</span>
+      <span className="live-word live-word--three">继续。</span>
+    </div>
+    <figure className="live-workspace"><img src={assetPath('assets/ableton/live-session-view.webp')} alt="Ableton Live Session View 的轨道、片段与音符编辑界面" loading="lazy" /></figure>
+    <figure className="live-push"><img src={assetPath('assets/ableton/official-push/p3-live-control.jpg')} alt="Push 3 控制 Ableton Live" loading="lazy" /></figure>
+    <p className="live-note">在 Push 上捕捉一次表演，再把同一个 Set 带进 Live 的 Session View 里继续编排、混音与打磨。</p>
+  </div></section>;
 }
 
 function Ending() {
@@ -283,5 +340,5 @@ function Ending() {
 }
 
 export default function App() {
-  return <><nav className="navigation" aria-label="主导航"><a href="#top" className="brand" aria-label="Push 3 概念站，返回顶部"><span className="brand-mark" aria-hidden="true">▦</span> PUSH<sup>3</sup></a><span className="nav-center">触碰 / 表达 / 创作</span><a href="#touch" className="nav-end">开始体验 <span>↓</span></a></nav><main><Hero /><EffectsPrelude /><Journey /><Showreel /><Standalone /><Live /><Ending /></main><footer className="footer"><span>PUSH 3 / INTERACTIVE CONCEPT</span><p>非官方概念项目。产品图片、设备界面与官方影片版权归 Ableton AG 所有，本项目与 Ableton AG 无合作或背书关系。</p><a href="https://www.ableton.com/en/push/" target="_blank" rel="noreferrer">了解 Push 3 ↗</a></footer></>;
+  return <><nav className="navigation" aria-label="主导航"><a href="#top" className="brand" aria-label="Push 3 概念站，返回顶部"><span className="brand-mark" aria-hidden="true">▦</span> PUSH<sup>3</sup></a><div className="nav-links"><a href="#effects">effects</a><a href="#touch">play</a><a href="#showreel">showreel</a><a href="#live">live</a></div></nav><main><Hero /><EffectsPrelude /><Journey /><Showreel /><Standalone /><Live /><Ending /></main><footer className="footer"><span>PUSH 3 / INTERACTIVE CONCEPT</span><p>非官方概念项目。产品图片、设备界面与官方影片版权归 Ableton AG 所有，本项目与 Ableton AG 无合作或背书关系。</p><a href="https://www.ableton.com/en/push/" target="_blank" rel="noreferrer">了解 Push 3 ↗</a></footer></>;
 }
